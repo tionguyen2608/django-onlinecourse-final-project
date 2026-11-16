@@ -1,0 +1,14 @@
+{% extends "onlinecourse/base.html" %}
+{% block title %}Sign up | OnlineCourse{% endblock %}
+{% block content %}
+<div class="card p-4 mx-auto" style="max-width:560px">
+    <h1 class="h3">Create your account</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <p><label for="firstname">First name</label><input class="form-control" id="firstname" name="firstname" autocomplete="given-name"></p>
+        <p><label for="lastname">Last name</label><input class="form-control" id="lastname" name="lastname" autocomplete="family-name"></p>
+        <button class="btn btn-primary" type="submit">Sign up</button>
+    </form>
+</div>
+{% endblock %}

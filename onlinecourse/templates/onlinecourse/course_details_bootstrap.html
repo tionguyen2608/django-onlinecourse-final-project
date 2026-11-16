@@ -1,0 +1,48 @@
+{% extends "onlinecourse/base.html" %}
+{% block title %}{{ course.name }} | OnlineCourse{% endblock %}
+{% block content %}
+<div class="hero">
+    <p class="text-uppercase mb-2">Course lessons and assessment</p>
+    <h1>{{ course.name }}</h1>
+    <p>{{ course.description }}</p>
+</div>
+<h2 class="h4 mb-3">Lessons</h2>
+{% for lesson in course.lesson_set.all %}
+    <section class="card">
+        <div class="card-header"><h3 class="h5 mb-0">Lesson {{ lesson.order|add:1 }}: {{ lesson.title }}</h3></div>
+        <div class="card-body">{{ lesson.content|linebreaks }}</div>
+    </section>
+{% empty %}
+    <p>No lessons have been published yet.</p>
+{% endfor %}
+{% if user.is_authenticated and is_enrolled %}
+    {% if questions %}
+    <details class="card p-4" open>
+        <summary class="h4 mb-3">Course exam</summary>
+        <p class="muted">Select all correct choices for each question. The passing score is 80%.</p>
+        <form id="questionform" action="{% url 'onlinecourse:submit' course.id %}" method="post">
+            {% csrf_token %}
+            {% for question in questions %}
+            <fieldset class="card p-3">
+                <legend class="h5">{{ forloop.counter }}. {{ question.question_text }}</legend>
+                <span class="muted">{{ question.grade }} point{{ question.grade|pluralize }}</span>
+                {% for choice in question.choice_set.all %}
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="choice_{{ choice.id }}" id="choice_{{ choice.id }}" value="{{ choice.id }}">
+                    <label class="form-check-label" for="choice_{{ choice.id }}">{{ choice.choice_text }}</label>
+                </div>
+                {% endfor %}
+            </fieldset>
+            {% endfor %}
+            <button class="btn btn-primary btn-lg" type="submit">Submit exam</button>
+        </form>
+    </details>
+    {% else %}<p class="alert alert-info">An exam has not been added to this course yet.</p>{% endif %}
+{% elif user.is_authenticated %}
+    <form action="{% url 'onlinecourse:enroll' course.id %}" method="post">
+        {% csrf_token %}<button class="btn btn-primary" type="submit">Enroll to take the exam</button>
+    </form>
+{% else %}
+    <p><a href="{% url 'onlinecourse:login' %}">Log in</a> and enroll to take the exam.</p>
+{% endif %}
+{% endblock %}

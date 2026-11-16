@@ -1,0 +1,19 @@
+{% extends "onlinecourse/base.html" %}
+{% block title %}Courses | OnlineCourse{% endblock %}
+{% block content %}
+<div class="hero"><h1>Learn. Practice. Achieve.</h1><p>Explore the lessons, enroll in a course, and test what you have learned.</p></div>
+<h2 class="h4 mb-4">Available courses</h2>
+<div class="row">
+{% for course in course_list %}
+<div class="col-md-6"><section class="card h-100">
+    {% if course.image %}<img class="course-image" src="{{ course.image.url }}" alt="{{ course.name }}">{% endif %}
+    <div class="card-body">
+        <h3 class="h4">{{ course.name }}</h3>
+        <p>{{ course.description }}</p>
+        <p class="muted">{{ course.total_enrollment }} learner{{ course.total_enrollment|pluralize }} enrolled</p>
+        <a class="btn btn-primary" href="{% url 'onlinecourse:course_details' course.id %}">{% if course.is_enrolled %}Continue learning{% else %}View course{% endif %}</a>
+    </div>
+</section></div>
+{% empty %}<p>No courses are available.</p>{% endfor %}
+</div>
+{% endblock %}

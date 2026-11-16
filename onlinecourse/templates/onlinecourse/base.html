@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}OnlineCourse{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'onlinecourse/bootstrap.min.css' %}">
+    <style>
+        body { background: #f5f7fb; color: #233044; }
+        .navbar { border-bottom: 1px solid #dce3ed; }
+        .brand { font-weight: 700; color: #184b96; }
+        main { max-width: 1080px; margin: 36px auto 60px; padding: 0 24px; }
+        .card { border: 1px solid #dce3ed; border-radius: 10px; margin-bottom: 18px; }
+        .card-header { background: #f7f9fc; border-bottom: 1px solid #dce3ed; }
+        .hero { background: #173e74; color: white; padding: 30px; border-radius: 12px; margin-bottom: 24px; }
+        .hero p { color: #d8e5f9; margin-bottom: 0; }
+        .form-check { margin: 12px 0; }
+        .result-header { padding: 26px; border-radius: 12px; margin-bottom: 24px; }
+        .score { font-size: 42px; font-weight: 700; }
+        .muted { color: #61728b; }
+        summary { cursor: pointer; }
+        .course-image { width: 100%; height: 180px; object-fit: cover; }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-light bg-white px-4 py-3">
+    <a class="navbar-brand brand" href="{% url 'onlinecourse:index' %}">OnlineCourse</a>
+    <div class="d-flex align-items-center">
+        {% if user.is_authenticated %}
+            <span class="mr-3">{{ user.get_full_name|default:user.username }}</span>
+            <form action="{% url 'onlinecourse:logout' %}" method="post">
+                {% csrf_token %}
+                <button class="btn btn-outline-secondary btn-sm" type="submit">Log out</button>
+            </form>
+        {% else %}
+            <a class="btn btn-outline-primary btn-sm mr-2" href="{% url 'onlinecourse:login' %}">Log in</a>
+            <a class="btn btn-primary btn-sm" href="{% url 'onlinecourse:registration' %}">Sign up</a>
+        {% endif %}
+    </div>
+</nav>
+<main>
+    {% for message in messages %}<div class="alert alert-info">{{ message }}</div>{% endfor %}
+    {% block content %}{% endblock %}
+</main>
+</body>
+</html>

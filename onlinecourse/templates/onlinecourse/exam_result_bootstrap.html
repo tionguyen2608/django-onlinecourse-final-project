@@ -1,0 +1,35 @@
+{% extends "onlinecourse/base.html" %}
+{% block title %}Exam results | {{ course.name }}{% endblock %}
+{% block content %}
+<section class="result-header {% if passed %}alert-success{% else %}alert-danger{% endif %}">
+    <p class="text-uppercase mb-2">{{ course.name }} · Exam completed</p>
+    {% if passed %}<h1>Congratulations, {{ user.first_name|default:user.username }}!</h1>
+    <p>You passed the course exam.</p>
+    {% else %}<h1>Keep learning, {{ user.first_name|default:user.username }}</h1>
+    <p>You need at least 80% to pass. Review your answers and try again.</p>{% endif %}
+    <div class="score">Score: {{ grade|floatformat:0 }}%</div>
+    <p class="mb-0">{{ earned_points }} of {{ total_points }} points · Passing score: 80%</p>
+</section>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4 mb-0">Exam results</h2>
+    <a class="btn btn-outline-primary" href="{% url 'onlinecourse:course_details' course.id %}">Back to course</a>
+</div>
+{% for result in question_results %}
+<section class="card">
+    <div class="card-header d-flex justify-content-between">
+        <h3 class="h5 mb-0">{{ forloop.counter }}. {{ result.question.question_text }}</h3>
+        <span class="badge {% if result.correct %}badge-success{% else %}badge-danger{% endif %}">{% if result.correct %}Correct{% else %}Incorrect{% endif %} · {{ result.earned }}/{{ result.question.grade }}</span>
+    </div>
+    <div class="card-body">
+        {% for item in result.choices %}
+        <div class="py-1 {% if item.choice.is_correct %}text-success{% endif %}">
+            {% if item.selected %}☑{% else %}☐{% endif %} {{ item.choice.choice_text }}
+            {% if item.choice.is_correct %}<span class="badge badge-light ml-2">Correct answer</span>{% endif %}
+            {% if item.selected %}<span class="badge badge-primary ml-2">Your selection</span>{% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endfor %}
+<p class="muted">Submission #{{ submission.id }} · {{ submission.submitted_at|date:"M j, Y, H:i" }}</p>
+{% endblock %}
