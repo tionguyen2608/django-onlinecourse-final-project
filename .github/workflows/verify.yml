@@ -1,0 +1,35 @@
+name: Verify project and capture evidence
+
+on:
+  push:
+    paths:
+      - '.github/workflows/verify.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Unpack source in the temporary runner
+        run: python -m zipfile -e Django_OnlineCourse_Final_Project.zip .
+      - name: Install and validate
+        run: |
+          python -m pip install -r requirements.txt playwright
+          python manage.py check
+          python manage.py test onlinecourse --verbosity 2
+      - name: Capture application screenshots
+        run: |
+          python -m playwright install --with-deps chromium
+          python tools/capture_evidence.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: project-evidence
+          path: screenshots/*.png
+          if-no-files-found: error
